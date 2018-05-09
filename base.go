@@ -1,4 +1,4 @@
-package openapi
+package openqq
 
 type UserInfo struct {
 	Ret             int32  `json:"ret"`

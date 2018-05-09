@@ -1,4 +1,4 @@
-package openapi
+package openqq
 
 import (
 	"crypto/hmac"

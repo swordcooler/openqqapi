@@ -1,1 +1,1 @@
-# qzone-oepnapi
+# openqqapi 
