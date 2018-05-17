@@ -111,6 +111,7 @@ type PlayzoneUserInfo struct {
 	Message         string `json:"message"`
 	IsVIP           int32  `json:"is_vip"`
 	VIPLevel        int32  `json:"vip_level"`
+	Score           int32  `json:"score"`
 	IsWhiteListUser int32  `json:"isWhiteListUser"`
 	ExpiredTime     int32  `json:"expiredtime"`
 }
