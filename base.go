@@ -1,5 +1,7 @@
 package openqq
 
+import "strconv"
+
 type UserInfo struct {
 	Ret             int32  `json:"ret"`
 	Msg             string `json:"msg"`
@@ -9,7 +11,7 @@ type UserInfo struct {
 	Country         string `json:"country"`
 	Province        string `json:"province"`
 	City            string `json:"city"`
-	FigureURl       string `json:"firgureurl"`
+	Figureurl       string `json:"figureurl"`
 	IsYellowVIP     int32  `json:"is_yellow_vip"`
 	IsYellowYearVIP int32  `json:"is_yellow_year_vip"`
 	YellowVIPLevel  int32  `json:"yellow_vip_level"`
@@ -19,7 +21,7 @@ type UserInfo struct {
 // https://wiki.qzone.qq.com/openapi/v3/user/get_info
 func GetInfo(appkey string, param *CommonParam) (error, *UserInfo) {
 	path := "/v3/user/get_info"
-	paramMap := make(map[string]interface{})
+	paramMap := make(map[string]string)
 
 	paramMap["openid"] = param.OpenID
 	if param.OpenKey != "" {
@@ -49,7 +51,7 @@ type LoginStatus struct {
 // https://wiki.qzone.qq.com/openapi/v3/user/is_login
 func IsLogin(appkey string, param *CommonParam) (error, *LoginStatus) {
 	path := "/v3/user/is_login"
-	paramMap := make(map[string]interface{})
+	paramMap := make(map[string]string)
 
 	paramMap["openid"] = param.OpenID
 	if param.OpenKey != "" {
@@ -83,7 +85,7 @@ type AppFriends struct {
 // https://wiki.qzone.qq.com/openapi/v3/relation/get_app_friends
 func GetAppFriend(appkey string, param *CommonParam) (error, *AppFriends) {
 	path := "/v3/relation/get_app_friends"
-	paramMap := make(map[string]interface{})
+	paramMap := make(map[string]string)
 
 	paramMap["openid"] = param.OpenID
 	if param.OpenKey != "" {
@@ -106,20 +108,22 @@ func GetAppFriend(appkey string, param *CommonParam) (error, *AppFriends) {
 }
 
 type PlayzoneUserInfo struct {
-	Code            int32  `json:"code"`
-	Subcode         int32  `json:"subcode"`
-	Message         string `json:"message"`
-	IsVIP           int32  `json:"is_vip"`
-	VIPLevel        int32  `json:"vip_level"`
-	Score           int32  `json:"score"`
-	IsWhiteListUser int32  `json:"isWhiteListUser"`
-	ExpiredTime     int32  `json:"expiredtime"`
+	Code    int32  `json:"code"`
+	Subcode int32  `json:"subcode"`
+	Message string `json:"message"`
+	Default int32  `json:"default"`
+	Data    [1]struct {
+		IsVIP       bool  `json:"is_vip"`
+		VIPLevel    int32 `json:"vip_level"`
+		Score       int32 `json:"score"`
+		ExpiredTime int32 `json:"expiredtime"`
+	} `json:"data"`
 }
 
 // https://wiki.qzone.qq.com/openapi/v3/user/get_playzone_userinfo
 func GetPlayzoneUserInfo(appkey string, param *CommonParam, zoneID int32) (error, *PlayzoneUserInfo) {
 	path := "/v3/user/get_playzone_userinfo"
-	paramMap := make(map[string]interface{})
+	paramMap := make(map[string]string)
 
 	paramMap["openid"] = param.OpenID
 	if param.OpenKey != "" {
@@ -132,7 +136,7 @@ func GetPlayzoneUserInfo(appkey string, param *CommonParam, zoneID int32) (error
 	paramMap["pf"] = param.PF
 	paramMap["format"] = param.Format
 	paramMap["userip"] = param.UserIP
-	paramMap["zoneid"] = zoneID
+	paramMap["zoneid"] = strconv.Itoa(int(zoneID))
 
 	sig := GenerateSign(appkey, "GET", path, paramMap)
 	paramMap["sig"] = sig
@@ -146,15 +150,17 @@ type BuyPlayzoneItemRet struct {
 	Code            int32  `json:"code"`
 	Subcode         int32  `json:"subcode"`
 	Message         string `json:"message"`
-	Billno          string `json:"billno"`
-	IsWhiteListUser int32  `json:"isWhiteListUser"`
-	Cost            int32  `json:"cost"`
+	IsWhiteListUser bool   `json:"isWhiteListUser"`
+	Data            [1]struct {
+		Billno string `json:"billno"`
+		Cost   int32  `json:"cost"`
+	} `json:"data"`
 }
 
 // https://wiki.qzone.qq.com/openapi/v3/user/buy_playzone_item
 func BuyPlayzoneItem(appkey string, param *CommonParam, zoneID int32, billno string, itemID string, count int32) (error, *BuyPlayzoneItemRet) {
 	path := "/v3/user/buy_playzone_item"
-	paramMap := make(map[string]interface{})
+	paramMap := make(map[string]string)
 
 	paramMap["openid"] = param.OpenID
 	if param.OpenKey != "" {
@@ -167,10 +173,10 @@ func BuyPlayzoneItem(appkey string, param *CommonParam, zoneID int32, billno str
 	paramMap["pf"] = param.PF
 	paramMap["format"] = param.Format
 	paramMap["userip"] = param.UserIP
-	paramMap["zoneid"] = zoneID
+	paramMap["zoneid"] = strconv.Itoa(int(zoneID))
 	paramMap["billno"] = billno
 	paramMap["itemid"] = itemID
-	paramMap["count"] = count
+	paramMap["count"] = strconv.Itoa(int(count))
 
 	sig := GenerateSign(appkey, "GET", path, paramMap)
 	paramMap["sig"] = sig
@@ -188,7 +194,7 @@ type GamebarMsg struct {
 // https://wiki.qzone.qq.com/openapi/v3/user/send_gamebar_msg
 func SendGamebarMsg(appkey string, param *CommonParam, frd string, msgType int32, content string) (error, *GamebarMsg) {
 	path := "/v3/user/send_gamebar_msg"
-	paramMap := make(map[string]interface{})
+	paramMap := make(map[string]string)
 
 	paramMap["openid"] = param.OpenID
 	if param.OpenKey != "" {
@@ -202,7 +208,7 @@ func SendGamebarMsg(appkey string, param *CommonParam, frd string, msgType int32
 	paramMap["format"] = param.Format
 	paramMap["userip"] = param.UserIP
 	paramMap["frd"] = frd
-	paramMap["msgtype"] = msgType
+	paramMap["msgtype"] = strconv.Itoa(int(msgType))
 	paramMap["cotent"] = content
 
 	sig := GenerateSign(appkey, "GET", path, paramMap)

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -27,7 +28,7 @@ type CommonParam struct {
 	UserIP      string // 用户的IP
 }
 
-func GenerateSign(appkey, method, path string, param map[string]interface{}) string {
+func GenerateSign(appkey, method, path string, param map[string]string) string {
 
 	encodePath := url.QueryEscape(path)
 
@@ -40,8 +41,8 @@ func GenerateSign(appkey, method, path string, param map[string]interface{}) str
 
 	var paramStr string
 	for k, v := range paramList {
-		paramStr += fmt.Sprint("%s=%v", v, param[v])
-		if k != len(paramList) {
+		paramStr += fmt.Sprintf("%s=%s", v, param[v])
+		if k != len(paramList)-1 {
 			paramStr += "&"
 		}
 	}
@@ -55,20 +56,21 @@ func GenerateSign(appkey, method, path string, param map[string]interface{}) str
 	mac.Write([]byte(source))
 
 	sig := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	log.Println("sig ", sig)
 	return sig
 }
 
-func Request(path, appKey string, paramMap map[string]interface{}, result interface{}) error {
-	requstURL := fmt.Sprintf("http://%s%s?", Host, path)
-
+func Request(path, appKey string, paramMap map[string]string, result interface{}) error {
+	requstURL := fmt.Sprintf("https://%s%s?", Host, path)
 	i := 0
 	for k, v := range paramMap {
 		i++
-		requstURL += fmt.Sprintf("%s=%v", k, v)
+		requstURL += fmt.Sprintf("%s=%s", k, url.QueryEscape(v))
 		if i != len(paramMap) {
 			requstURL += "&"
 		}
 	}
+	log.Println("request url ", requstURL)
 
 	resp, err := http.Get(requstURL)
 	if err != nil {
