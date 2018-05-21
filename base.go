@@ -113,7 +113,7 @@ type PlayzoneUserInfo struct {
 	Message string `json:"message"`
 	Default int32  `json:"default"`
 	Data    [1]struct {
-		IsVIP       bool  `json:"is_vip"`
+		//IsVIP       bool  `json:"is_vip"`
 		VIPLevel    int32 `json:"vip_level"`
 		Score       int32 `json:"score"`
 		ExpiredTime int32 `json:"expiredtime"`
